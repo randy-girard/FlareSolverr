@@ -78,22 +78,16 @@ def get_webdriver(request_info=False) -> WebDriver:
         except:
             pass
 
-    sw_options = {}
-    if proxy_info is not None:
-        proxy_url = proxy_info['url']  #
-        sw_options = {
-            'proxy': {
-                'http': proxy_url,
-                'https': proxy_url,
-                'no_proxy': 'localhost,127.0.0.1'
-            }
-        }
-
     # downloads and patches the chromedriver
     # if we don't set driver_executable_path it downloads, patches, and deletes the driver each time
     driver = sw_uc.Chrome(options=options, driver_executable_path=driver_exe_path, version_main=version_main,
-                          windows_headless=windows_headless, seleniumwire_options=sw_options)
+                          windows_headless=windows_headless)
 
+    if proxy_info is not None:
+        driver.proxy = {
+          "http": proxy_info['url']
+        }
+        
     # save the patched driver to avoid re-downloads
     if driver_exe_path is None:
         PATCHED_DRIVER_PATH = os.path.join(driver.patcher.data_path, driver.patcher.exe_name)
